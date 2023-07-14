@@ -19,7 +19,10 @@ end
 
 function Bucket:isOpen()
   local rotation = (self.angle + self.angleOffset) % 360
-  return 135 < rotation and rotation < 225
+
+  -- The opening is 45 degrees, but we need to adjust it a bit because food has
+  -- non-zero radius
+  return 140 < rotation and rotation < 220
 end
 
 function Bucket:feed()

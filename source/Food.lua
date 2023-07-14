@@ -14,9 +14,10 @@ function Food:init(row)
 end
 
 function Food:move(isConsuming)
-  self.x -= 1
+  local oldX = self.x
+  self.x -= 3
 
-  if self.x == 53 then
+  if oldX > 53 and self.x <= 53 then
     self.isConsumed = isConsuming
   end
 end
@@ -30,6 +31,5 @@ function Food:isDead()
 end
 
 function Food:draw()
-  -- TODO(indutny): RowObject
   gfx.fillCircleAtPoint(self.x, 29 + (self.row - 1) * 60, 5)
 end

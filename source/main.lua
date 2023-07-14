@@ -38,11 +38,10 @@ initGame()
 function playdate.update()
   local crank = playdate.getCrankPosition()
 
-  gfx.clear()
+  -- Update objects
 
   for i, bucket in ipairs(buckets) do
     bucket:setAngle(crank)
-    bucket:draw(i)
   end
 
   -- TODO(indutny): if bucket is full - remove it with animation and sound and
@@ -53,8 +52,6 @@ function playdate.update()
     local b = buckets[f.row]
 
     f:move(b:isOpen())
-    f:move(b:isOpen())
-    f:move(b:isOpen())
 
     if f:isDead() then
       if f.isConsumed then
@@ -63,13 +60,26 @@ function playdate.update()
       end
       table.remove(food, i)
     else
-      f:draw()
     end
   end
 
-  playdate.drawFPS(0, 0)
+  -- Draw objects
+
+  gfx.clear()
+  for i, bucket in ipairs(buckets) do
+    bucket:draw(i)
+  end
+  for _, f in ipairs(food) do
+    f:draw()
+  end
+
+  -- TODO(indutny): remove FPS
   playdate.timer.updateTimers()
   if playdate.isCrankDocked() then
     playdate.ui.crankIndicator:update()
   end
+end
+
+function playdate.debugDraw()
+  playdate.drawFPS(0, 0)
 end
