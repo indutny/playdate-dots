@@ -12,8 +12,8 @@ import "objects/Bucket"
 import "objects/Food"
 
 local MAX_LIFE <const> = 5
-local INITIAL_FOOD_COUNTDOWN <const> = 75
-local INITIAL_FOOD_SPEED <const> = 2
+local INITIAL_FOOD_COUNTDOWN <const> = 85
+local INITIAL_FOOD_SPEED <const> = 1.5
 
 local gfx <const> = playdate.graphics
 local heartImage = gfx.image.new("images/heart")
