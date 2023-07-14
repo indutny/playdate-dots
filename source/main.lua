@@ -7,18 +7,17 @@ import "CoreLibs/ui"
 import "Bucket"
 import "Food"
 
+local MAX_LIFE <const> = 5
 local gfx <const> = playdate.graphics
 
 local buckets = nil
 local food = nil
 local foodTimer = nil
+local score = nil
+local life = nil
 
 function addFood()
   table.insert(food, Food(math.random(1, 4)))
-end
-
-function playdate.crankDocked()
-  playdate.ui.crankIndicator:start()
 end
 
 function initGame()
@@ -27,6 +26,8 @@ function initGame()
 
   buckets = {Bucket(0), Bucket(90), Bucket(180), Bucket(270)}
   food = {}
+  score = 0
+  life = MAX_LIFE
 
   foodTimer = playdate.timer.keyRepeatTimerWithDelay(1000, 1000, addFood)
 
@@ -40,15 +41,14 @@ function playdate.update()
 
   -- Update objects
 
-  for i, bucket in ipairs(buckets) do
-    bucket:setAngle(crank)
+  for _, bucket in ipairs(buckets) do
+    if bucket ~= nil then
+      bucket:setAngle(crank)
+    end
   end
 
-  -- TODO(indutny): if bucket is full - remove it with animation and sound and
-  -- add a new bucket instead of it.
-
   for i = #food, 1, -1 do
-    f = food[i]
+    local f = food[i]
     local b = buckets[f.row]
 
     f:move(b:isOpen())
@@ -57,27 +57,68 @@ function playdate.update()
       if f.isConsumed then
         -- TODO(indutny): sound
         b:feed()
+        score += 1
+      else
+        life -= 1
       end
       table.remove(food, i)
-    else
+    end
+  end
+
+  for row = #buckets, 1, -1 do
+    local bucket = buckets[row]
+    if bucket:isFull() then
+      -- TODO(indutny): sound and animation
+      local newBucket = Bucket(math.random(0, 3) * 90)
+      newBucket:setAngle(crank)
+      buckets[row] = newBucket
+      if life < MAX_LIFE then
+        life += 1
+      end
+
+      -- Remove all food on this row
+      for i = #food, 1, -1 do
+        local f = food[i]
+        if f.row == row then
+          table.remove(food, i)
+        end
+      end
     end
   end
 
   -- Draw objects
 
   gfx.clear()
-  for i, bucket in ipairs(buckets) do
-    bucket:draw(i)
+
+  for row, bucket in ipairs(buckets) do
+    bucket:draw(row)
   end
   for _, f in ipairs(food) do
     f:draw()
   end
 
-  -- TODO(indutny): remove FPS
+  gfx.drawTextAligned(
+    "*Score: " .. tostring(score) .. "*",
+    398,
+    2,
+    kTextAlignment.right)
+
+  gfx.drawTextAligned(
+    "*Life: " .. tostring(life) .. "*",
+    398,
+    222,
+    kTextAlignment.right)
+
+  -- Update internal playdate state
+
   playdate.timer.updateTimers()
   if playdate.isCrankDocked() then
     playdate.ui.crankIndicator:update()
   end
+end
+
+function playdate.crankDocked()
+  playdate.ui.crankIndicator:start()
 end
 
 function playdate.debugDraw()
