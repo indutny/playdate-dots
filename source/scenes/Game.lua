@@ -4,13 +4,17 @@ import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/ui"
 
+import "scenes/Scene"
+import "scenes/Menu"
+import "scenes/GameOver"
+
 import "objects/Bucket"
 import "objects/Food"
 
 local MAX_LIFE <const> = 5
 local gfx <const> = playdate.graphics
 
-class("Game").extends()
+class("Game").extends(Scene)
 
 function Game:init()
   Game.super.init(self)
@@ -55,6 +59,9 @@ function Game:update()
         self.score += 1
       else
         self.life -= 1
+        if self.life <= 0 then
+          self:toGameOver()
+        end
       end
       table.remove(self.food, i)
     end
@@ -64,7 +71,10 @@ function Game:update()
     local bucket = self.buckets[row]
     if bucket:isFull() then
       -- TODO(indutny): sound and animation
-      local newBucket = Bucket(math.random(0, 3) * 90)
+
+      -- Make sure that new bucket is always rotated differently
+      local newBucket = Bucket(
+        (bucket.angleOffset + math.random(1, 3) * 90) % 360)
       newBucket:setAngle(crank)
       self.buckets[row] = newBucket
       if self.life < MAX_LIFE then
@@ -83,7 +93,6 @@ function Game:update()
 
   -- Draw objects
 
-  gfx.clear()
   gfx.setLineWidth(4)
 
   for row, bucket in ipairs(self.buckets) do
@@ -104,4 +113,12 @@ function Game:update()
     398,
     222,
     kTextAlignment.right)
+end
+
+function Game:toGameOver()
+  setCurrentScene(GameOver(self.score))
+end
+
+function Game:BButtonUp()
+  setCurrentScene(Menu())
 end

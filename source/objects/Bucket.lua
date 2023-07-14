@@ -47,4 +47,3 @@ function Bucket:draw(row)
     gfx.fillCircleAtPoint(29, 29 + (row - 1) * 60, self.score * 2)
   end
 end
-
