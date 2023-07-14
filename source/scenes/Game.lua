@@ -12,6 +12,9 @@ import "objects/Bucket"
 import "objects/Food"
 
 local MAX_LIFE <const> = 5
+local INITIAL_FOOD_COUNTDOWN <const> = 75
+local INITIAL_FOOD_SPEED <const> = 2
+
 local gfx <const> = playdate.graphics
 local heartImage = gfx.image.new("images/heart")
 
@@ -24,13 +27,9 @@ function Game:init()
   self.food = {}
   self.score = 0
   self.life = MAX_LIFE
+  self.foodCountdown = 0
 
-  self.foodTimer = playdate.timer.keyRepeatTimerWithDelay(1250, 1250, Game.addFood, self)
-  self.foodSpeed = 2
-end
-
-function Game:remove()
-  self.foodTimer:remove()
+  self.foodSpeed = INITIAL_FOOD_SPEED
 end
 
 function Game:addFood()
@@ -38,18 +37,17 @@ function Game:addFood()
 end
 
 function Game:bumpFoodSpeed()
-  self.foodSpeed += 1 / 64
-  if self.foodSpeed < 3 then
-    self.foodTimer.delay = 1250
-  elseif self.foodSpeed < 4 then
-    self.foodTimer.delay = 1000
-  else
-    self.foodTimer.delay = 850
-  end
+  self.foodSpeed += 1 / 32
 end
 
 function Game:update()
   local crank = playdate.getCrankPosition()
+
+  self.foodCountdown -= self.foodSpeed
+  if self.foodCountdown <= 0 then
+    self:addFood()
+    self.foodCountdown = INITIAL_FOOD_COUNTDOWN
+  end
 
   -- Update objects
 
