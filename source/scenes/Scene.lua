@@ -1,6 +1,6 @@
-import "CoreLibs/object"
+import 'CoreLibs/object'
 
-class("Scene").extends()
+class('Scene').extends()
 
 function Scene:init()
   Scene.super.init(self)

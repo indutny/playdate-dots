@@ -1,15 +1,15 @@
-import "CoreLibs/object"
-import "CoreLibs/graphics"
-import "CoreLibs/sprites"
-import "CoreLibs/timer"
-import "CoreLibs/ui"
+import 'CoreLibs/object'
+import 'CoreLibs/graphics'
+import 'CoreLibs/sprites'
+import 'CoreLibs/timer'
+import 'CoreLibs/ui'
 
-import "scenes/Scene"
-import "scenes/Game"
+import 'scenes/Scene'
+import 'scenes/Game'
 
 local gfx <const> = playdate.graphics
 
-class("Menu").extends(Scene)
+class('Menu').extends(Scene)
 
 function Menu:init()
   Menu.super.init(self)
@@ -17,7 +17,7 @@ end
 
 function Menu:update()
   gfx.drawTextAligned(
-    "*Press (A) to Start*",
+    '*Press (A) to Start*',
     200,
     115,
     kTextAlignment.center)

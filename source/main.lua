@@ -2,6 +2,7 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
+import "CoreLibs/frameTimer"
 import "CoreLibs/ui"
 
 import "scenes/Menu"
@@ -34,6 +35,7 @@ function playdate.update()
   -- Update internal playdate state
 
   playdate.timer.updateTimers()
+  playdate.frameTimer.updateTimers()
   if playdate.isCrankDocked() then
     playdate.ui.crankIndicator:update()
   end

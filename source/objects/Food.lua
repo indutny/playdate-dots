@@ -1,5 +1,5 @@
 import 'CoreLibs/object'
-import "CoreLibs/graphics"
+import 'CoreLibs/graphics'
 
 local gfx <const> = playdate.graphics
 
@@ -12,6 +12,9 @@ function Food:init(row)
   self.row = row
   self.isConsumed = false
   self.speed = 1
+end
+
+function Food:remove()
 end
 
 function Food:setSpeed(speed)
