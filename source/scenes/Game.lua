@@ -25,7 +25,8 @@ function Game:init()
   self.score = 0
   self.life = MAX_LIFE
 
-  self.foodTimer = playdate.timer.keyRepeatTimerWithDelay(1000, 1000, Game.addFood, self)
+  self.foodTimer = playdate.timer.keyRepeatTimerWithDelay(1250, 1250, Game.addFood, self)
+  self.foodSpeed = 2
 end
 
 function Game:remove()
@@ -34,6 +35,17 @@ end
 
 function Game:addFood()
   table.insert(self.food, Food(math.random(1, 4)))
+end
+
+function Game:bumpFoodSpeed()
+  self.foodSpeed += 1 / 64
+  if self.foodSpeed < 3 then
+    self.foodTimer.delay = 1250
+  elseif self.foodSpeed < 4 then
+    self.foodTimer.delay = 1000
+  else
+    self.foodTimer.delay = 850
+  end
 end
 
 function Game:update()
@@ -51,6 +63,7 @@ function Game:update()
     local f = self.food[i]
     local b = self.buckets[f.row]
 
+    f:setSpeed(self.foodSpeed)
     f:move(b:isOpen())
 
     if f:isDead() then
@@ -58,8 +71,10 @@ function Game:update()
         -- TODO(indutny): sound
         b:feed()
         self.score += 1
+        self:bumpFoodSpeed()
       else
         self.life -= 1
+
         if self.life <= 0 then
           self:toGameOver()
         end

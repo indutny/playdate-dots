@@ -11,11 +11,16 @@ function Food:init(row)
   self.x = 405
   self.row = row
   self.isConsumed = false
+  self.speed = 1
+end
+
+function Food:setSpeed(speed)
+  self.speed = speed
 end
 
 function Food:move(isConsuming)
   local oldX = self.x
-  self.x -= 3
+  self.x -= self.speed
 
   if oldX > 53 and self.x <= 53 then
     self.isConsumed = isConsuming
