@@ -13,6 +13,7 @@ import "objects/Food"
 
 local MAX_LIFE <const> = 5
 local gfx <const> = playdate.graphics
+local heartImage = gfx.image.new("images/heart")
 
 class("Game").extends(Scene)
 
@@ -102,17 +103,22 @@ function Game:update()
     f:draw()
   end
 
+  self:drawScore()
+  self:drawLife()
+end
+
+function Game:drawScore()
   gfx.drawTextAligned(
     "*Score: " .. tostring(self.score) .. "*",
     398,
     2,
     kTextAlignment.right)
+end
 
-  gfx.drawTextAligned(
-    "*Life: " .. tostring(self.life) .. "*",
-    398,
-    222,
-    kTextAlignment.right)
+function Game:drawLife()
+  for i = 1, self.life do
+    heartImage:draw(398 - 18 * i, 222)
+  end
 end
 
 function Game:toGameOver()
