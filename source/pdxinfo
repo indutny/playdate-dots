@@ -1,8 +1,7 @@
-name=tbd
+name=Dots
 author=Fedor Indutnyy
 description=When all you have is a ton of bricks, everything looks like a paddle.
-bundleID=com.indutny.tbd
+bundleID=com.indutny.dots
 version=1.0
-buildNumber=123
-imagePath=path/to/launcher/assets
-launchSoundPath=path/to/launch/sound/file
+buildNumber=1
+imagePath=card
