@@ -67,6 +67,8 @@ function Food:draw()
   local radius = FOOD_RADIUS
   if self:isFadingOut() then
     radius = self.fadeOutTimer.value
+  elseif self.x <= 53 then
+    radius = math.max(0, self.x - 29) / (53 - 29) * (FOOD_RADIUS - 2) + 2
   end
   gfx.fillCircleAtPoint(self.x, 29 + (self.row - 1) * 60, radius)
 end
