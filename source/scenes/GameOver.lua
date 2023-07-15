@@ -8,25 +8,46 @@ import 'scenes/Scene'
 import 'scenes/Menu'
 
 local gfx <const> = playdate.graphics
+local numeralFont = gfx.font.new('fonts/Roobert-24-Medium-Numerals')
 
 class('GameOver').extends(Scene)
 
 function GameOver:init(score)
   GameOver.super.init(self)
 
+  local data = playdate.datastore.read()
+  if data == nil then
+    data = { highScore = score }
+  elseif data.highScore == nil then
+    data.highScore = score
+  else
+    data.highScore = math.max(score, data.highScore)
+  end
+  playdate.datastore.write(data)
+
   self.score = score
+  self.highScore = data.highScore
+
+  gfx.setLineWidth(2)
 end
 
 function GameOver:update()
-  gfx.drawTextAligned(
-    '*Game over*',
+  numeralFont:drawTextAligned(
+    'Score: ' .. tostring(self.score),
     200,
-    105,
+    120 - numeralFont:getHeight() / 2,
     kTextAlignment.center)
+
   gfx.drawTextAligned(
-    '*Score: ' .. tostring(self.score) ..'*',
+    'High Score: ' .. tostring(self.highScore),
     200,
-    125,
+    150,
+    kTextAlignment.center)
+
+  gfx.drawTextAligned(
+    'Press Ⓐ to Play Again',
+    200,
+    185,
     kTextAlignment.center)
 end
 

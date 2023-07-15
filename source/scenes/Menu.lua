@@ -8,18 +8,22 @@ import 'scenes/Scene'
 import 'scenes/Game'
 
 local gfx <const> = playdate.graphics
+local titleImage = gfx.image.new('images/title')
 
 class('Menu').extends(Scene)
 
 function Menu:init()
   Menu.super.init(self)
+  gfx.setLineWidth(2)
 end
 
 function Menu:update()
+  titleImage:draw(0, 0)
+
   gfx.drawTextAligned(
-    '*Press (A) to Start*',
+    'Press Ⓐ to Start',
     200,
-    115,
+    165,
     kTextAlignment.center)
 end
 

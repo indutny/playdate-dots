@@ -16,7 +16,12 @@ local INITIAL_FOOD_COUNTDOWN <const> = 85
 local INITIAL_FOOD_SPEED <const> = 1.5
 
 local gfx <const> = playdate.graphics
+
 local heartImage = gfx.image.new('images/heart')
+local hitSample = playdate.sound.sampleplayer.new('sounds/hit.wav')
+local missSample = playdate.sound.sampleplayer.new('sounds/miss.wav')
+local upSample = playdate.sound.sampleplayer.new('sounds/up.wav')
+local loseSample = playdate.sound.sampleplayer.new('sounds/lose.wav')
 
 class('Game').extends(Scene)
 
@@ -46,7 +51,7 @@ function Game:addFood()
 end
 
 function Game:bumpFoodSpeed()
-  self.foodSpeed += 1 / 32
+  self.foodSpeed += 1 / 48
 end
 
 function Game:emptyBucket(row)
@@ -59,6 +64,7 @@ function Game:emptyBucket(row)
     delta * 90,
     INITIAL_FOOD_COUNTDOWN / self.foodSpeed / 4
   )
+  upSample:play()
 
   if self.life < MAX_LIFE then
     self.life += 1
@@ -102,11 +108,14 @@ function Game:update()
         -- TODO(indutny): sound
         b:feed()
         self.score += 1
+        hitSample:play()
         self:bumpFoodSpeed()
       else
         self.life -= 1
+        missSample:play()
 
         if self.life <= 0 then
+          loseSample:play()
           self:toGameOver()
         end
       end
@@ -138,7 +147,7 @@ end
 
 function Game:drawScore()
   gfx.drawTextAligned(
-    '*Score: ' .. tostring(self.score) .. '*',
+    'Score: ' .. tostring(self.score),
     398,
     2,
     kTextAlignment.right)

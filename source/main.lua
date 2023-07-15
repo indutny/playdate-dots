@@ -1,13 +1,13 @@
-import "CoreLibs/object"
-import "CoreLibs/graphics"
-import "CoreLibs/sprites"
-import "CoreLibs/timer"
-import "CoreLibs/frameTimer"
-import "CoreLibs/ui"
+import 'CoreLibs/object'
+import 'CoreLibs/graphics'
+import 'CoreLibs/sprites'
+import 'CoreLibs/timer'
+import 'CoreLibs/frameTimer'
+import 'CoreLibs/ui'
 
-import "scenes/Menu"
-import "scenes/Game"
-import "scenes/GameOver"
+import 'scenes/Menu'
+import 'scenes/Game'
+import 'scenes/GameOver'
 
 local gfx <const> = playdate.graphics
 
@@ -16,6 +16,9 @@ local scene = nil
 function initGame()
   math.randomseed(playdate.getSecondsSinceEpoch())
   playdate.ui.crankIndicator:start()
+
+  local font = gfx.font.new('fonts/Roobert-11-Medium')
+  gfx.setFont(font)
 
   scene = Menu()
 end
