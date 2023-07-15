@@ -11,10 +11,11 @@ local gfx <const> = playdate.graphics
 
 class('Bucket').extends()
 
-function Bucket:init(row, angle)
+function Bucket:init(row, angle, hitSample)
   Bucket.super.init(self)
 
   self.angle = angle
+  self.hitSample = hitSample
   self.crank = 0
   self.score = 0
   self.temporaryScore = 0

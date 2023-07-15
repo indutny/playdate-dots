@@ -18,7 +18,12 @@ local FOOD_SPEED <const> = 45
 local gfx <const> = playdate.graphics
 
 local heartImage = gfx.image.new('images/heart')
-local hitSample = playdate.sound.sampleplayer.new('sounds/hit.wav')
+local hitSamples = {
+  playdate.sound.sampleplayer.new('sounds/hit-1.wav'),
+  playdate.sound.sampleplayer.new('sounds/hit-2.wav'),
+  playdate.sound.sampleplayer.new('sounds/hit-3.wav'),
+  playdate.sound.sampleplayer.new('sounds/hit-4.wav'),
+}
 local missSample = playdate.sound.sampleplayer.new('sounds/miss.wav')
 local upSample = playdate.sound.sampleplayer.new('sounds/up.wav')
 local loseSample = playdate.sound.sampleplayer.new('sounds/lose.wav')
@@ -28,7 +33,7 @@ class('Game').extends(Scene)
 function Game:init()
   Game.super.init(self)
 
-  self.buckets = {Bucket(2, 0), Bucket(3, 180)}
+  self.buckets = {Bucket(2, 0, hitSamples[1]), Bucket(3, 180, hitSamples[2])}
   self.foodList = {}
   self.score = 0
   self.life = MAX_LIFE
@@ -106,12 +111,12 @@ function Game:incScore()
   if self.score == 5 then
     self.buckets[1]:moveToRow(1 + 1 / 3)
     self.buckets[2]:moveToRow(4 - 1 / 3)
-    table.insert(self.buckets, Bucket(2.5, 90))
+    table.insert(self.buckets, Bucket(2.5, 90, hitSamples[3]))
   elseif self.score == 30 then
     self.buckets[1]:moveToRow(1)
     self.buckets[2]:moveToRow(4)
     self.buckets[3]:moveToRow(2)
-    table.insert(self.buckets, Bucket(3, 270))
+    table.insert(self.buckets, Bucket(3, 270, hitSamples[4]))
   elseif self.score == 100 then
     for _, bucket in ipairs(self.buckets) do
       bucket:setOpeningAngle(30)
@@ -140,7 +145,7 @@ function Game:update()
       if food.isConsumed then
         bucket:feed()
         if not bucket:isFull() then
-          hitSample:play()
+          bucket.hitSample:play()
         end
         self:incScore()
         self:bumpFoodSpeed()
