@@ -57,7 +57,6 @@ end
 function Game:emptyBucket(row)
   local bucket = self.buckets[row]
 
-  -- TODO(indutny): sound and animation
   -- Always select an angle different from the previous one
   local delta = math.random(1, 3)
   bucket:emptyAndRotate(
@@ -105,10 +104,11 @@ function Game:update()
 
     if f:isDead() then
       if f.isConsumed then
-        -- TODO(indutny): sound
         b:feed()
+        if not b:isFull() then
+          hitSample:play()
+        end
         self.score += 1
-        hitSample:play()
         self:bumpFoodSpeed()
       else
         self.life -= 1
