@@ -15,16 +15,24 @@ class('Menu').extends(Scene)
 function Menu:init()
   Menu.super.init(self)
   gfx.setLineWidth(2)
+
+  self.fadeIn = playdate.timer.new(
+    250,
+    0,
+    1)
 end
 
 function Menu:update()
-  titleImage:draw(0, 0)
+  titleImage:drawFaded(
+    0, 0, self.fadeIn.value, gfx.image.kDitherTypeFloydSteinberg)
 
-  gfx.drawTextAligned(
-    'Press Ⓐ to Start',
-    200,
-    165,
-    kTextAlignment.center)
+  if self.fadeIn.value == 1 then
+    gfx.drawTextAligned(
+      'Press Ⓐ to Start',
+      200,
+      165,
+      kTextAlignment.center)
+  end
 end
 
 function Menu:AButtonUp()

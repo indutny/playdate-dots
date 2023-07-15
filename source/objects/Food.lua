@@ -4,7 +4,6 @@ import 'CoreLibs/timer'
 import 'CoreLibs/easing'
 
 local FOOD_RADIUS <const> = 5
-local START_OFFSET <const> = 375
 
 local gfx <const> = playdate.graphics
 
@@ -17,9 +16,11 @@ function Food:init(bucket, speed)
   self.speed = speed
   self.isConsumed = nil
 
+  local screenWidth = playdate.display.getWidth()
+  local startOffset = screenWidth - self.bucket:getX()
   self.moveTimer = playdate.timer.new(
-    (START_OFFSET - self.bucket.getX()) / speed * 1000,
-    START_OFFSET - self.bucket:getX(),
+    startOffset / speed * 1000,
+    startOffset,
     0,
     playdate.easingFunctions.linear)
 end

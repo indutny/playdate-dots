@@ -13,7 +13,7 @@ import 'objects/Food'
 
 local MAX_LIFE <const> = 5
 local FOOD_DISTANCE <const> = 85
-local INITIAL_FOOD_SPEED <const> = 45
+local FOOD_SPEED <const> = 45
 
 local gfx <const> = playdate.graphics
 
@@ -33,7 +33,7 @@ function Game:init()
   self.score = 0
   self.life = MAX_LIFE
 
-  self.foodSpeed = INITIAL_FOOD_SPEED
+  self.speedMultiplier = 1
   self.lastFoodRow = 1
 
   self:addFood()
@@ -53,17 +53,27 @@ function Game:addFood()
   self.lastFoodRow = (self.lastFoodRow + math.random(1, 3) - 1) % 4 + 1
   local row = self.lastFoodRow
   local bucket = self.buckets[row]
-  local food = Food(bucket, self.foodSpeed)
+  local food = Food(bucket, self:getFoodSpeed())
   table.insert(self.foodList, food)
 
   -- Add more food
-  playdate.timer.new(FOOD_DISTANCE / self.foodSpeed * 1000, function()
+  playdate.timer.new(FOOD_DISTANCE / self:getFoodSpeed() * 1000, function()
     self:addFood()
   end)
 end
 
+function Game:getFoodSpeed()
+  return self.speedMultiplier * FOOD_SPEED
+end
+
 function Game:bumpFoodSpeed()
-  self.foodSpeed += 1 / 64
+  if self.speedMultiplier < 1.5 then
+    self.speedMultiplier += 1 / 32
+  elseif self.speedMultiplier < 2 then
+    self.speedMultiplier += 1 / 64
+  else
+    self.speedMultiplier += 1 / 128
+  end
 end
 
 function Game:emptyBucket(row)
@@ -74,7 +84,7 @@ function Game:emptyBucket(row)
   bucket:emptyAndRotate(
     (delta - 0.5) * 2 * 90,
     -- Quarter of delta between food
-    FOOD_DISTANCE / self.foodSpeed / 4 * 1000
+    FOOD_DISTANCE / self:getFoodSpeed() / 4 * 1000
   )
   upSample:play()
 
