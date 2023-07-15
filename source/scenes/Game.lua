@@ -35,6 +35,7 @@ function Game:init()
   self.foodCountdown = 0
 
   self.foodSpeed = INITIAL_FOOD_SPEED
+  self.lastFoodRow = 1
 end
 
 function Game:remove()
@@ -47,7 +48,9 @@ function Game:remove()
 end
 
 function Game:addFood()
-  table.insert(self.food, Food(math.random(1, 4)))
+  -- Always select a row different from the last one
+  self.lastFoodRow = (self.lastFoodRow + math.random(1, 3) - 1) % 4 + 1
+  table.insert(self.food, Food(self.lastFoodRow))
 end
 
 function Game:bumpFoodSpeed()
