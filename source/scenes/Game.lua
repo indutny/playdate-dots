@@ -61,9 +61,10 @@ function Game:emptyBucket(row)
   local bucket = self.buckets[row]
 
   -- Always select an angle different from the previous one
-  local delta = math.random(1, 3)
+  local delta = math.random(0, 1)
   bucket:emptyAndRotate(
-    delta * 90,
+    (delta - 0.5) * 2 * 90,
+    -- Quarter of delta between food
     INITIAL_FOOD_COUNTDOWN / self.foodSpeed / 4
   )
   upSample:play()
