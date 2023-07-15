@@ -55,5 +55,5 @@ function playdate.crankDocked()
 end
 
 function playdate.debugDraw()
-  playdate.drawFPS(0, 0)
+  -- playdate.drawFPS(0, 0)
 end
