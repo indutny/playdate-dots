@@ -17,11 +17,13 @@ function Food:init(bucket, speed)
   self.isConsumed = nil
 
   local screenWidth = playdate.display.getWidth()
-  local startOffset = screenWidth - self.bucket:getX()
+
+  self.initialOffset = screenWidth - self.bucket:getX()
+
   self.moveTimer = playdate.timer.new(
-    startOffset / speed * 1000,
-    startOffset,
+    self.initialOffset / speed * 1000,
     0,
+    1,
     playdate.easingFunctions.linear)
 end
 
@@ -30,25 +32,29 @@ function Food:remove()
 end
 
 function Food:isDead()
-  local x = self.moveTimer.value
+  local offset = self:getOffset()
   if self.isConsumed then
-    return x <= 0
+    return offset <= 0
   else
-    return x <= self.bucket:getOpening()
+    return offset <= self.bucket:getOpening()
   end
 end
 
 function Food:update()
-  local x = self.moveTimer.value
+  local offset = self:getOffset()
   local bucketOpening = self.bucket:getOpening()
 
-  if self.isConsumed == nil and x <= bucketOpening then
+  if self.isConsumed == nil and offset <= bucketOpening then
     self.isConsumed = self.bucket:isOpen()
   end
 end
 
+function Food:getOffset()
+  return (1 - self.moveTimer.value) * self.initialOffset
+end
+
 function Food:getX()
-  return self.moveTimer.value + self.bucket:getX()
+  return self.bucket:getX() + self:getOffset()
 end
 
 function Food:getY()
@@ -56,7 +62,7 @@ function Food:getY()
 end
 
 function Food:draw()
-  local offset = self.moveTimer.value
+  local offset = self:getOffset()
 
   if self:isDead() then
     return

@@ -4,6 +4,7 @@ import 'CoreLibs/timer'
 import 'CoreLibs/easing'
 
 local MAX_BUCKET_SCORE <const> = 8
+local RADIUS <const> = 22
 
 local gfx <const> = playdate.graphics
 
@@ -12,17 +13,28 @@ class('Bucket').extends()
 function Bucket:init(row, angle)
   Bucket.super.init(self)
 
-  self.row = row
   self.angle = angle
   self.crank = 0
   self.score = 0
   self.temporaryScore = 0
 
+  self.radiusTimer = playdate.timer.new(
+    250,
+    0,
+    RADIUS,
+    playdate.easingFunctions.inCubic)
+  self.rowTimer = playdate.timer.new(
+    250,
+    row,
+    row,
+    playdate.easingFunctions.outCubic)
   self.angleTimer = nil
   self.scoreTimer = nil
 end
 
 function Bucket:remove()
+  self.radiusTimer:remove()
+  self.rowTimer:remove()
   if self.angleTimer ~= nil then
     self.angleTimer:remove()
   end
@@ -90,6 +102,15 @@ function Bucket:updateScoreTo(newValue, duration)
   self.score = newValue
 end
 
+function Bucket:moveToRow(row)
+  self.rowTimer:remove()
+  self.rowTimer = playdate.timer.new(
+    250,
+    self.rowTimer.value,
+    row,
+    playdate.easingFunctions.outCubic)
+end
+
 function Bucket:getX()
   return 29
 end
@@ -99,7 +120,7 @@ function Bucket:getOpening()
 end
 
 function Bucket:getY()
-  return 29 + (self.row - 1) * 60
+  return 29 + (self.rowTimer.value - 1) * 60
 end
 
 function Bucket:draw(row)
@@ -109,7 +130,7 @@ function Bucket:draw(row)
   gfx.drawArc(
     x,
     y,
-    22,
+    self.radiusTimer.value,
     self.angle - 45 + self.crank,
     self.angle + 235 + self.crank)
 

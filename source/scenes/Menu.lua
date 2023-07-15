@@ -22,6 +22,10 @@ function Menu:init()
     1)
 end
 
+function Menu:remove()
+  self.fadeIn:remove()
+end
+
 function Menu:update()
   titleImage:drawFaded(
     0, 0, self.fadeIn.value, gfx.image.kDitherTypeFloydSteinberg)

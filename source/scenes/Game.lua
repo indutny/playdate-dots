@@ -28,7 +28,7 @@ class('Game').extends(Scene)
 function Game:init()
   Game.super.init(self)
 
-  self.buckets = {Bucket(1, 0), Bucket(2, 90), Bucket(3, 180), Bucket(4, 270)}
+  self.buckets = {Bucket(2, 0), Bucket(3, 180)}
   self.foodList = {}
   self.score = 0
   self.life = MAX_LIFE
@@ -41,7 +41,9 @@ end
 
 function Game:remove()
   for _, bucket in ipairs(self.buckets) do
-    bucket:remove()
+    if bucket ~= nil then
+      bucket:remove()
+    end
   end
   for _, food in ipairs(self.foodList) do
     food:remove()
@@ -50,7 +52,7 @@ end
 
 function Game:addFood()
   -- Always select a row different from the last one
-  self.lastFoodRow = (self.lastFoodRow + math.random(1, 3) - 1) % 4 + 1
+  self.lastFoodRow = (self.lastFoodRow + math.random(1, #self.buckets - 1) - 1) % #self.buckets + 1
   local row = self.lastFoodRow
   local bucket = self.buckets[row]
   local food = Food(bucket, self:getFoodSpeed())
@@ -93,6 +95,20 @@ function Game:emptyBucket(row)
   end
 end
 
+function Game:incScore()
+  self.score += 1
+  if self.score == 6 then
+    self.buckets[1]:moveToRow(1 + 1 / 3)
+    self.buckets[2]:moveToRow(4 - 1 / 3)
+    table.insert(self.buckets, Bucket(2.5, 90))
+  elseif self.score == 32 then
+    self.buckets[1]:moveToRow(1)
+    self.buckets[2]:moveToRow(4)
+    self.buckets[3]:moveToRow(2)
+    table.insert(self.buckets, Bucket(3, 270))
+  end
+end
+
 function Game:update()
   local crank = playdate.getCrankPosition()
 
@@ -116,7 +132,7 @@ function Game:update()
         if not bucket:isFull() then
           hitSample:play()
         end
-        self.score += 1
+        self:incScore()
         self:bumpFoodSpeed()
       else
         self.life -= 1
