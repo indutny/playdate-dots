@@ -112,11 +112,12 @@ function Game:update()
         self:bumpFoodSpeed()
       else
         self.life -= 1
-        missSample:play()
 
         if self.life <= 0 then
           loseSample:play()
           self:toGameOver()
+        else
+          missSample:play()
         end
       end
       table.remove(self.food, i)

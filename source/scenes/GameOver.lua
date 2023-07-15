@@ -8,7 +8,7 @@ import 'scenes/Scene'
 import 'scenes/Menu'
 
 local gfx <const> = playdate.graphics
-local numeralFont = gfx.font.new('fonts/Roobert-24-Medium-Numerals')
+local numeralFont = gfx.font.new('fonts/Roobert-24-Medium')
 
 class('GameOver').extends(Scene)
 
@@ -25,21 +25,21 @@ function GameOver:init(score)
   end
   playdate.datastore.write(data)
 
-  self.score = score
-  self.highScore = data.highScore
+  self.score = tostring(score)
+  self.highScore = tostring(data.highScore)
 
   gfx.setLineWidth(2)
 end
 
 function GameOver:update()
   numeralFont:drawTextAligned(
-    'Score: ' .. tostring(self.score),
+    self.score,
     200,
     120 - numeralFont:getHeight() / 2,
     kTextAlignment.center)
 
   gfx.drawTextAligned(
-    'High Score: ' .. tostring(self.highScore),
+    'High Score: ' .. self.highScore,
     200,
     150,
     kTextAlignment.center)

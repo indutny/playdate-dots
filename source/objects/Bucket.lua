@@ -37,7 +37,7 @@ function Bucket:isOpen()
 
   -- The opening is 45 degrees, but we need to adjust it a bit because food has
   -- non-zero radius
-  return 140 < angle and angle < 220
+  return 145 < angle and angle < 215
 end
 
 function Bucket:feed()
