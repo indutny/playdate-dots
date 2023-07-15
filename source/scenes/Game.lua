@@ -10,6 +10,7 @@ import 'scenes/GameOver'
 
 import 'objects/Bucket'
 import 'objects/Food'
+import 'objects/Track'
 
 local MAX_LIFE <const> = 5
 local INITIAL_FOOD_COUNTDOWN <const> = 85
@@ -32,10 +33,9 @@ function Game:init()
   self.food = {}
   self.score = 0
   self.life = MAX_LIFE
-  self.foodCountdown = 0
 
   self.foodSpeed = INITIAL_FOOD_SPEED
-  self.lastFoodRow = 1
+  self.track = Track(INITIAL_FOOD_COUNTDOWN, self.foodSpeed)
 end
 
 function Game:remove()
@@ -45,16 +45,16 @@ function Game:remove()
   for _, f in ipairs(self.food) do
     f:remove()
   end
+  self.track:remove()
 end
 
-function Game:addFood()
-  -- Always select a row different from the last one
-  self.lastFoodRow = (self.lastFoodRow + math.random(1, 3) - 1) % 4 + 1
-  table.insert(self.food, Food(self.lastFoodRow))
+function Game:addFood(row)
+  table.insert(self.food, Food(row))
 end
 
 function Game:bumpFoodSpeed()
   self.foodSpeed += 1 / 64
+  self.track:setSpeed(self.foodSpeed)
 end
 
 function Game:emptyBucket(row)
@@ -84,13 +84,12 @@ end
 function Game:update()
   local crank = playdate.getCrankPosition()
 
-  self.foodCountdown -= self.foodSpeed
-  if self.foodCountdown <= 0 then
-    self:addFood()
-    self.foodCountdown = INITIAL_FOOD_COUNTDOWN
-  end
-
   -- Update objects
+
+  local maybeFoodRow = self.track:update()
+  if maybeFoodRow ~= nil then
+    self:addFood(maybeFoodRow)
+  end
 
   for _, bucket in ipairs(self.buckets) do
     if bucket ~= nil then
@@ -107,12 +106,10 @@ function Game:update()
 
     if f:isDead() then
       if f:isFadingOut() then
-        -- Nothing, really. Just let it disappear
+        self.track:playNote();
       elseif f.isConsumed then
+        self.track:playNote();
         b:feed()
-        if not b:isFull() then
-          hitSample:play()
-        end
         self.score += 1
         self:bumpFoodSpeed()
       else
@@ -123,6 +120,7 @@ function Game:update()
           self:toGameOver()
         else
           missSample:play()
+          self.track:skipNote();
         end
       end
       f:remove()

@@ -56,7 +56,7 @@ function Food:isFadingOut()
 end
 
 function Food:isDead()
-  if self.isConsumed then
+  if self:isFadingOut() or self.isConsumed then
     return self.x <= 29
   else
     return self.x <= 53
@@ -70,5 +70,5 @@ function Food:draw()
   elseif self.x <= 53 then
     radius = math.max(0, self.x - 29) / (53 - 29) * (FOOD_RADIUS - 2) + 2
   end
-  gfx.fillCircleAtPoint(self.x, 29 + (self.row - 1) * 60, radius)
+  gfx.fillCircleAtPoint(math.floor(self.x), 29 + (self.row - 1) * 60, radius)
 end
