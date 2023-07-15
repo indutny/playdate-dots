@@ -9,181 +9,24 @@ local clapSample = playdate.sound.sampleplayer.new(
 local hhSample = playdate.sound.sampleplayer.new(
   'sounds/hh-sample.wav')
 
-local leadSample = playdate.sound.sample.new(
-  'sounds/lead-sample.wav')
-local bassSample = playdate.sound.sample.new(
-  'sounds/bass-sample.wav')
-
 class('Track').extends()
 
 local leadNotes = {
-  {'E3', 1, 4},
-  {'G3', 1, 3},
-  {'Bb3', 1, 2},
-  {'A3', 1, 1},
-  {'F3', 1, 2},
-  {'E3', 1, 3},
-  {'D3', 1, 4},
-  {'C3', 1, 1},
-
-  {'C3', 1, 1},
-  {'E3', 1, 4},
-  {'Bb3', 1, 3},
-  {'C4', 1, 2},
-  {'D4', 1, 1},
-  {'C4', 1, 2},
-  {'D4', 1, 1},
-  {'Eb4', 1, 4},
-
-  {'E4', 1, 3},
-  {'F4', 1, 2},
+  {'Eb4', 1, 2},
   {'D4', 1, 3},
-  {'C4', 1, 4},
-  {'E4', 2, 3},
-  {'C4', 2, 4},
 
-  {'E4', 1, 3},
-  {'F4', 1, 2},
-  {'A3', 1, 3},
-  {'B3', 1, 2},
-  {'Db4', 1, 1},
-  {'D4', 1, 4},
-  {'B3', 1, 1},
-  {'E4', 1, 4},
+  {'F4', 1, 1},
+  {'E4', 1, 2},
+
+  {'C4', 1, 4},
+  {'D4', 1, 3},
+
+  {'D4', 1, 3},
+  {'Eb4', 1, 2},
 }
 
 local bassNotes = {
-  -- First melody
-  {'C3', 1 / 4},
-  {'C3', 1 / 4},
-  {nil, 1 / 4},
-  {'C3', 1 / 4},
-  {'C3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'F3', 1 / 4},
-  {nil, 1 / 8},
-  {'F3', 1 / 4},
-  {nil, 1 / 4},
-  {'F3', 1 / 8},
-  {'F3', 1 / 4},
-  {'F3', 1 / 4},
-  {nil, 1 / 2},
-
-  {'A3', 1 / 4},
-  {'A3', 1 / 4},
-  {nil, 1 / 4},
-  {'A3', 1 / 4},
-  {'A3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'G3', 1 / 4},
-  {nil, 1 / 8},
-  {'G3', 1 / 4},
-  {nil, 1 / 4},
-  {'G3', 1 / 8},
-  {'G3', 1 / 4},
-  {'G3', 1 / 4},
-  {nil, 1 / 2},
-
-  -- Second melody
-  {'C3', 1 / 4},
-  {'C3', 1 / 4},
-  {nil, 1 / 4},
-  {'C3', 1 / 4},
-  {'C3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'F3', 1 / 4},
-  {nil, 1 / 8},
-  {'F3', 1 / 4},
-  {nil, 1 / 4},
-  {'F3', 1 / 8},
-  {'F3', 1 / 4},
-  {'F3', 1 / 4},
-  {nil, 1 / 2},
-
-  {'A3', 1 / 4},
-  {'A3', 1 / 4},
-  {nil, 1 / 4},
-  {'A3', 1 / 4},
-  {'A3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'Ab3', 1 / 4},
-  {nil, 1 / 8},
-  {'Ab3', 1 / 4},
-  {nil, 1 / 4},
-  {'Ab3', 1 / 8},
-  {'Ab3', 1 / 4},
-  {'Ab3', 1 / 4},
-  {nil, 1 / 2},
-
-  -- Third melody
-  {'D3', 1 / 4},
-  {'D3', 1 / 4},
-  {nil, 1 / 4},
-  {'D3', 1 / 4},
-  {'D3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'F3', 1 / 4},
-  {nil, 1 / 8},
-  {'F3', 1 / 4},
-  {nil, 1 / 4},
-  {'F3', 1 / 8},
-  {'F3', 1 / 4},
-  {'F3', 1 / 4},
-  {nil, 1 / 2},
-
-  {'A3', 1 / 4},
-  {'A3', 1 / 4},
-  {nil, 1 / 4},
-  {'A3', 1 / 4},
-  {'A3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'F3', 1 / 4},
-  {nil, 1 / 8},
-  {'F3', 1 / 4},
-  {nil, 1 / 4},
-  {'F3', 1 / 8},
-  {'F3', 1 / 4},
-  {'F3', 1 / 4},
-  {nil, 1 / 2},
-
-  -- Fourth melody
-  {'D3', 1 / 4},
-  {'D3', 1 / 4},
-  {nil, 1 / 4},
-  {'D3', 1 / 4},
-  {'D3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'F3', 1 / 4},
-  {nil, 1 / 8},
-  {'F3', 1 / 4},
-  {nil, 1 / 4},
-  {'F3', 1 / 8},
-  {'F3', 1 / 4},
-  {'F3', 1 / 4},
-  {nil, 1 / 2},
-
-  {'G3', 1 / 4},
-  {'G3', 1 / 4},
-  {nil, 1 / 4},
-  {'G3', 1 / 4},
-  {'G3', 1 / 4},
-  {nil, 3 / 4},
-
-  {'D3', 1 / 4},
-  {nil, 1 / 8},
-  {'D3', 1 / 4},
-  {nil, 1 / 4},
-  {'D3', 1 / 8},
-  {'D3', 1 / 4},
-  {'D3', 1 / 4},
-  {nil, 1 / 2},
+  {nil,  1 / 8},
 }
 
 local drumNotes = {
@@ -209,18 +52,18 @@ function Track:init(quarterBar, speed)
   self.quarterBar = quarterBar
   self.speed = speed
   self.leadCountdown = 0
-  self.bassCountdown = 405 - 30
-  self.drumCountdown = 405 - 30 - 4 * quarterBar
+  self.bassCountdown = 405 - 29 - 4 * quarterBar
+  self.drumCountdown = 405 - 29 - 4 * quarterBar
 
   self.displayedNote = 1
   self.playedNote = 1
   self.bassNote = 1
   self.drumNote = 1
 
-  self.leadSynth = playdate.sound.synth.new(leadSample)
+  self.leadSynth = playdate.sound.synth.new(playdate.sound.kWaveTriangle)
   self.leadSynth:setADSR(0.005, 0, 1, 0.1)
 
-  self.bassSynth = playdate.sound.synth.new(bassSample)
+  self.bassSynth = playdate.sound.synth.new(playdate.sound.kWaveSine)
   self.bassSynth:setADSR(0.005, 0, 1, 0.1)
 end
 
@@ -252,7 +95,7 @@ function Track:update()
     self.bassNote = 1 + (self.bassNote % #bassNotes)
     self.bassCountdown += note[2] * self.quarterBar
     if note[1] ~= nil then
-      self.bassSynth:playNote(note[1], 1, self.quarterBar * note[2] / self.speed / FPS)
+      self.bassSynth:playNote(note[1], 0.5, self.quarterBar * note[2] / self.speed / 2 / FPS)
     end
   end
 
@@ -273,7 +116,7 @@ end
 
 function Track:playNote()
   local note = leadNotes[self.playedNote]
-  self.leadSynth:playNote(note[1], 1, self.quarterBar * note[2] / self.speed / FPS)
+  self.leadSynth:playNote(note[1], 0.5, self.quarterBar / self.speed / 2 / FPS)
   self.playedNote = 1 + (self.playedNote % #leadNotes)
 end
 
