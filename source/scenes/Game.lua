@@ -69,6 +69,12 @@ function Game:getFoodSpeed()
 end
 
 function Game:bumpFoodSpeed()
+  -- Do not bump speed initially
+  if #self.buckets < 3 then
+    return
+  end
+
+  -- Bump faster at first, then slower
   if self.speedMultiplier < 1.5 then
     self.speedMultiplier += 1 / 32
   elseif self.speedMultiplier < 2 then
@@ -97,15 +103,19 @@ end
 
 function Game:incScore()
   self.score += 1
-  if self.score == 6 then
+  if self.score == 5 then
     self.buckets[1]:moveToRow(1 + 1 / 3)
     self.buckets[2]:moveToRow(4 - 1 / 3)
     table.insert(self.buckets, Bucket(2.5, 90))
-  elseif self.score == 32 then
+  elseif self.score == 30 then
     self.buckets[1]:moveToRow(1)
     self.buckets[2]:moveToRow(4)
     self.buckets[3]:moveToRow(2)
     table.insert(self.buckets, Bucket(3, 270))
+  elseif self.score == 100 then
+    for _, bucket in ipairs(self.buckets) do
+      bucket:setOpeningAngle(30)
+    end
   end
 end
 

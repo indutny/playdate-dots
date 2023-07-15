@@ -5,6 +5,7 @@ import 'CoreLibs/easing'
 
 local MAX_BUCKET_SCORE <const> = 8
 local RADIUS <const> = 22
+local OPENING_ADJUSTMENT <const> = 10
 
 local gfx <const> = playdate.graphics
 
@@ -28,6 +29,12 @@ function Bucket:init(row, angle)
     row,
     row,
     playdate.easingFunctions.outCubic)
+  self.openingTimer = playdate.timer.new(
+    250,
+    45,
+    45,
+    playdate.easingFunctions.outCubic)
+
   self.angleTimer = nil
   self.scoreTimer = nil
 end
@@ -35,6 +42,7 @@ end
 function Bucket:remove()
   self.radiusTimer:remove()
   self.rowTimer:remove()
+  self.openingTimer:remove()
   if self.angleTimer ~= nil then
     self.angleTimer:remove()
   end
@@ -48,11 +56,13 @@ function Bucket:update(crank)
 end
 
 function Bucket:isOpen()
-  local angle = (self.crank + self.angle) % 360
+  local angle = (self.crank + self.angle) % 360 - 180
 
   -- The opening is 45 degrees, but we need to adjust it a bit because food has
   -- non-zero radius
-  return 145 < angle and angle < 215
+  local opening = math.max(0, self.openingTimer.value - OPENING_ADJUSTMENT)
+
+  return -opening < angle and angle < opening
 end
 
 function Bucket:feed()
@@ -111,6 +121,15 @@ function Bucket:moveToRow(row)
     playdate.easingFunctions.outCubic)
 end
 
+function Bucket:setOpeningAngle(newAngle)
+  self.openingTimer:remove()
+  self.openingTimer = playdate.timer.new(
+    250,
+    self.openingTimer.value,
+    newAngle,
+    playdate.easingFunctions.outCubic)
+end
+
 function Bucket:getX()
   return 29
 end
@@ -131,8 +150,8 @@ function Bucket:draw(row)
     x,
     y,
     self.radiusTimer.value,
-    self.angle - 45 + self.crank,
-    self.angle + 235 + self.crank)
+    self.angle - 90 + self.openingTimer.value + self.crank,
+    self.angle + 270 - self.openingTimer.value + self.crank)
 
   local displayScore = self.score + self.temporaryScore
   if displayScore > 0 then
