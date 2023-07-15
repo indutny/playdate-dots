@@ -1,6 +1,6 @@
 import 'CoreLibs/object'
 import 'CoreLibs/graphics'
-import 'CoreLibs/frameTimer'
+import 'CoreLibs/timer'
 import 'CoreLibs/easing'
 
 local MAX_BUCKET_SCORE <const> = 8
@@ -9,9 +9,10 @@ local gfx <const> = playdate.graphics
 
 class('Bucket').extends()
 
-function Bucket:init(angle)
+function Bucket:init(row, angle)
   Bucket.super.init(self)
 
+  self.row = row
   self.angle = angle
   self.crank = 0
   self.score = 0
@@ -44,7 +45,7 @@ end
 
 function Bucket:feed()
   if not self:isFull() then
-    self:updateScoreTo(self.score + 1, 5)
+    self:updateScoreTo(self.score + 1, 125)
   end
 end
 
@@ -52,14 +53,14 @@ function Bucket:isFull()
   return self.score >= MAX_BUCKET_SCORE
 end
 
-function Bucket:emptyAndRotate(degrees, frames)
+function Bucket:emptyAndRotate(degrees, duration)
   if self.angleTimer ~= nil then
     self.angleTimer:remove()
   end
   local newAngle = (self.angle + math.max(0, degrees)) % 360
 
-  self.angleTimer = playdate.frameTimer.new(
-    frames,
+  self.angleTimer = playdate.timer.new(
+    duration,
     self.angle,
     self.angle + (math.random(0, 1) - 0.5) * 2 * degrees,
     playdate.easingFunctions.inOutCubic)
@@ -68,15 +69,15 @@ function Bucket:emptyAndRotate(degrees, frames)
     self.angle = timer.value
   end
 
-  self:updateScoreTo(0, frames)
+  self:updateScoreTo(0, duration)
 end
 
-function Bucket:updateScoreTo(newValue, frames)
+function Bucket:updateScoreTo(newValue, duration)
   if self.scoreTimer ~= nil then
     self.scoreTimer:remove()
   end
-  self.scoreTimer = playdate.frameTimer.new(
-    frames,
+  self.scoreTimer = playdate.timer.new(
+    duration,
     self.score - newValue,
     0,
     playdate.easingFunctions.outCubic)
@@ -89,16 +90,31 @@ function Bucket:updateScoreTo(newValue, frames)
   self.score = newValue
 end
 
+function Bucket:getX()
+  return 29
+end
+
+function Bucket:getOpening()
+  return 24
+end
+
+function Bucket:getY()
+  return 29 + (self.row - 1) * 60
+end
+
 function Bucket:draw(row)
+  local x = self:getX()
+  local y = self:getY()
+
   gfx.drawArc(
-    29,
-    29 + (row - 1) * 60,
+    x,
+    y,
     22,
     self.angle - 45 + self.crank,
     self.angle + 235 + self.crank)
 
   local displayScore = self.score + self.temporaryScore
   if displayScore > 0 then
-    gfx.fillCircleAtPoint(29, 29 + (row - 1) * 60, displayScore * 2)
+    gfx.fillCircleAtPoint(x, y, displayScore * 2)
   end
 end

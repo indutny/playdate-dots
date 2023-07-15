@@ -25,8 +25,8 @@ function GameOver:init(score)
   end
   playdate.datastore.write(data)
 
-  self.score = tostring(score)
-  self.highScore = tostring(data.highScore)
+  self.score = score
+  self.highScore = data.highScore
 
   gfx.setLineWidth(2)
 end

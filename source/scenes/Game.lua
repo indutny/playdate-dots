@@ -12,8 +12,8 @@ import 'objects/Bucket'
 import 'objects/Food'
 
 local MAX_LIFE <const> = 5
-local INITIAL_FOOD_COUNTDOWN <const> = 85
-local INITIAL_FOOD_SPEED <const> = 1.5
+local FOOD_DISTANCE <const> = 85
+local INITIAL_FOOD_SPEED <const> = 45
 
 local gfx <const> = playdate.graphics
 
@@ -28,29 +28,38 @@ class('Game').extends(Scene)
 function Game:init()
   Game.super.init(self)
 
-  self.buckets = {Bucket(0), Bucket(90), Bucket(180), Bucket(270)}
-  self.food = {}
+  self.buckets = {Bucket(1, 0), Bucket(2, 90), Bucket(3, 180), Bucket(4, 270)}
+  self.foodList = {}
   self.score = 0
   self.life = MAX_LIFE
-  self.foodCountdown = 0
 
   self.foodSpeed = INITIAL_FOOD_SPEED
   self.lastFoodRow = 1
+
+  self:addFood()
 end
 
 function Game:remove()
   for _, bucket in ipairs(self.buckets) do
     bucket:remove()
   end
-  for _, f in ipairs(self.food) do
-    f:remove()
+  for _, food in ipairs(self.foodList) do
+    food:remove()
   end
 end
 
 function Game:addFood()
   -- Always select a row different from the last one
   self.lastFoodRow = (self.lastFoodRow + math.random(1, 3) - 1) % 4 + 1
-  table.insert(self.food, Food(self.lastFoodRow))
+  local row = self.lastFoodRow
+  local bucket = self.buckets[row]
+  local food = Food(bucket, self.foodSpeed)
+  table.insert(self.foodList, food)
+
+  -- Add more food
+  playdate.timer.new(FOOD_DISTANCE / self.foodSpeed * 1000, function()
+    self:addFood()
+  end)
 end
 
 function Game:bumpFoodSpeed()
@@ -65,30 +74,17 @@ function Game:emptyBucket(row)
   bucket:emptyAndRotate(
     (delta - 0.5) * 2 * 90,
     -- Quarter of delta between food
-    INITIAL_FOOD_COUNTDOWN / self.foodSpeed / 4
+    FOOD_DISTANCE / self.foodSpeed / 4 * 1000
   )
   upSample:play()
 
   if self.life < MAX_LIFE then
     self.life += 1
   end
-
-  -- Remove food on left side of this row
-  for _, f in ipairs(self.food) do
-    if f.row == row and f.x <= 200 then
-      f:fadeOut()
-    end
-  end
 end
 
 function Game:update()
   local crank = playdate.getCrankPosition()
-
-  self.foodCountdown -= self.foodSpeed
-  if self.foodCountdown <= 0 then
-    self:addFood()
-    self.foodCountdown = INITIAL_FOOD_COUNTDOWN
-  end
 
   -- Update objects
 
@@ -98,19 +94,16 @@ function Game:update()
     end
   end
 
-  for i = #self.food, 1, -1 do
-    local f = self.food[i]
-    local b = self.buckets[f.row]
+  for i = #self.foodList, 1, -1 do
+    local food = self.foodList[i]
+    local bucket = food.bucket
 
-    f:setSpeed(self.foodSpeed)
-    f:move(b:isOpen())
+    food:update()
 
-    if f:isDead() then
-      if f:isFadingOut() then
-        -- Nothing, really. Just let it disappear
-      elseif f.isConsumed then
-        b:feed()
-        if not b:isFull() then
+    if food:isDead() then
+      if food.isConsumed then
+        bucket:feed()
+        if not bucket:isFull() then
           hitSample:play()
         end
         self.score += 1
@@ -125,8 +118,8 @@ function Game:update()
           missSample:play()
         end
       end
-      f:remove()
-      table.remove(self.food, i)
+      food:remove()
+      table.remove(self.foodList, i)
     end
   end
 
@@ -144,8 +137,8 @@ function Game:update()
   for row, bucket in ipairs(self.buckets) do
     bucket:draw(row)
   end
-  for _, f in ipairs(self.food) do
-    f:draw()
+  for _, food in ipairs(self.foodList) do
+    food:draw()
   end
 
   self:drawScore()

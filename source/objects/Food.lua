@@ -1,74 +1,70 @@
 import 'CoreLibs/object'
 import 'CoreLibs/graphics'
-import 'CoreLibs/frameTimer'
+import 'CoreLibs/timer'
 import 'CoreLibs/easing'
 
 local FOOD_RADIUS <const> = 5
+local START_OFFSET <const> = 375
 
 local gfx <const> = playdate.graphics
 
 class('Food').extends()
 
-function Food:init(row)
+function Food:init(bucket, speed)
   Food.super.init(self)
 
-  self.x = 405
-  self.row = row
-  self.isConsumed = false
-  self.speed = 1
+  self.bucket = bucket
+  self.speed = speed
+  self.isConsumed = nil
 
-  self.fadeOutTimer = nil
+  self.moveTimer = playdate.timer.new(
+    (START_OFFSET - self.bucket.getX()) / speed * 1000,
+    START_OFFSET - self.bucket:getX(),
+    0,
+    playdate.easingFunctions.linear)
 end
 
 function Food:remove()
-  if self.fadeOutTimer ~= nil then
-    self.fadeOutTimer:remove()
-  end
-end
-
-function Food:fadeOut()
-  if self:isFadingOut() then
-    return
-  end
-
-  self.fadeOutTimer = playdate.frameTimer.new(
-    15,
-    FOOD_RADIUS,
-    0,
-    playdate.easingFunctions.inOutCubic)
-end
-
-function Food:setSpeed(speed)
-  self.speed = speed
-end
-
-function Food:move(isConsuming)
-  local oldX = self.x
-  self.x -= self.speed
-
-  if oldX > 53 and self.x <= 53 then
-    self.isConsumed = isConsuming
-  end
-end
-
-function Food:isFadingOut()
-  return self.fadeOutTimer ~= nil
+  self.moveTimer:remove()
 end
 
 function Food:isDead()
+  local x = self.moveTimer.value
   if self.isConsumed then
-    return self.x <= 29
+    return x <= 0
   else
-    return self.x <= 53
+    return x <= self.bucket:getOpening()
   end
 end
 
-function Food:draw()
-  local radius = FOOD_RADIUS
-  if self:isFadingOut() then
-    radius = self.fadeOutTimer.value
-  elseif self.x <= 53 then
-    radius = math.max(0, self.x - 29) / (53 - 29) * (FOOD_RADIUS - 2) + 2
+function Food:update()
+  local x = self.moveTimer.value
+  local bucketOpening = self.bucket:getOpening()
+
+  if self.isConsumed == nil and x <= bucketOpening then
+    self.isConsumed = self.bucket:isOpen()
   end
-  gfx.fillCircleAtPoint(self.x, 29 + (self.row - 1) * 60, radius)
+end
+
+function Food:getX()
+  return self.moveTimer.value + self.bucket:getX()
+end
+
+function Food:getY()
+  return self.bucket:getY()
+end
+
+function Food:draw()
+  local offset = self.moveTimer.value
+
+  if self:isDead() then
+    return
+  end
+
+  local bucketOpening = self.bucket:getOpening()
+  local radius = FOOD_RADIUS
+  if offset <= bucketOpening then
+    radius = offset / bucketOpening * (FOOD_RADIUS - 2) + 2
+  end
+  gfx.fillCircleAtPoint(self:getX(), self:getY(), radius)
 end
