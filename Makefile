@@ -1,4 +1,4 @@
-Dots.pdx: source/**
+Dots.pdx: source/**/*
 	pdc source Dots.pdx
 
 all: Dots.pdx

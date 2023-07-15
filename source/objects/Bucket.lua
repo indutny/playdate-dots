@@ -3,6 +3,8 @@ import 'CoreLibs/graphics'
 import 'CoreLibs/frameTimer'
 import 'CoreLibs/easing'
 
+local MAX_BUCKET_SCORE <const> = 8
+
 local gfx <const> = playdate.graphics
 
 class('Bucket').extends()
@@ -47,7 +49,7 @@ function Bucket:feed()
 end
 
 function Bucket:isFull()
-  return self.score >= 8
+  return self.score >= MAX_BUCKET_SCORE
 end
 
 function Bucket:emptyAndRotate(degrees, frames)

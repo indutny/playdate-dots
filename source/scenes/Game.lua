@@ -69,11 +69,10 @@ function Game:emptyBucket(row)
     self.life += 1
   end
 
-  -- Remove all food on this row
-  for i = #self.food, 1, -1 do
-    local f = self.food[i]
-    if f.row == row then
-      table.remove(self.food, i)
+  -- Remove food on left side of this row
+  for _, f in ipairs(self.food) do
+    if f.row == row and f.x <= 200 then
+      f:fadeOut()
     end
   end
 end
@@ -103,7 +102,9 @@ function Game:update()
     f:move(b:isOpen())
 
     if f:isDead() then
-      if f.isConsumed then
+      if f:isFadingOut() then
+        -- Nothing, really. Just let it disappear
+      elseif f.isConsumed then
         b:feed()
         if not b:isFull() then
           hitSample:play()
@@ -120,6 +121,7 @@ function Game:update()
           missSample:play()
         end
       end
+      f:remove()
       table.remove(self.food, i)
     end
   end

@@ -1,5 +1,9 @@
 import 'CoreLibs/object'
 import 'CoreLibs/graphics'
+import 'CoreLibs/frameTimer'
+import 'CoreLibs/easing'
+
+local FOOD_RADIUS <const> = 5
 
 local gfx <const> = playdate.graphics
 
@@ -12,9 +16,26 @@ function Food:init(row)
   self.row = row
   self.isConsumed = false
   self.speed = 1
+
+  self.fadeOutTimer = nil
 end
 
 function Food:remove()
+  if self.fadeOutTimer ~= nil then
+    self.fadeOutTimer:remove()
+  end
+end
+
+function Food:fadeOut()
+  if self:isFadingOut() then
+    return
+  end
+
+  self.fadeOutTimer = playdate.frameTimer.new(
+    15,
+    FOOD_RADIUS,
+    0,
+    playdate.easingFunctions.inOutCubic)
 end
 
 function Food:setSpeed(speed)
@@ -30,6 +51,10 @@ function Food:move(isConsuming)
   end
 end
 
+function Food:isFadingOut()
+  return self.fadeOutTimer ~= nil
+end
+
 function Food:isDead()
   if self.isConsumed then
     return self.x <= 29
@@ -39,5 +64,9 @@ function Food:isDead()
 end
 
 function Food:draw()
-  gfx.fillCircleAtPoint(self.x, 29 + (self.row - 1) * 60, 5)
+  local radius = FOOD_RADIUS
+  if self:isFadingOut() then
+    radius = self.fadeOutTimer.value
+  end
+  gfx.fillCircleAtPoint(self.x, 29 + (self.row - 1) * 60, radius)
 end
