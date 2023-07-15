@@ -51,7 +51,7 @@ function Game:addFood()
 end
 
 function Game:bumpFoodSpeed()
-  self.foodSpeed += 1 / 48
+  self.foodSpeed += 1 / 64
 end
 
 function Game:emptyBucket(row)
