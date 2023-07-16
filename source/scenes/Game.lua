@@ -81,11 +81,11 @@ function Game:bumpFoodSpeed()
 
   -- Bump faster at first, then slower
   if self.speedMultiplier < 1.5 then
-    self.speedMultiplier += 1 / 32
-  elseif self.speedMultiplier < 2 then
     self.speedMultiplier += 1 / 64
-  else
+  elseif self.speedMultiplier < 2 then
     self.speedMultiplier += 1 / 128
+  else
+    self.speedMultiplier += 1 / 256
   end
 end
 
